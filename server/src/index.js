@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Serve React frontend (client build)
-const clientBuildPath = path.join(__dirname, "./dist"); // server/dist
+const clientBuildPath = path.join(__dirname, "../dist"); // server/dist
 app.use(express.static(clientBuildPath));
 
 // Health check
