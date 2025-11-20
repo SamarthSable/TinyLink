@@ -48,9 +48,11 @@ app.get("/:code", async (req, res) => {
 });
 
 // Catch-all route for React frontend
-app.get("*", (req, res) => {
+// Catch-all route for React frontend
+app.get("/:path(*)", (req, res) => {
   res.sendFile(path.join(__dirname, "./dist/index.html"));
 });
+
 
 // Connect to MongoDB and start server
 mongoose
