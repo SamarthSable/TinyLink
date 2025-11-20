@@ -3,31 +3,36 @@ import { nanoid } from "nanoid";
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
+
 export const createLink = async (req, res) => {
   try {
-    const { url } = req.body;
+    const { url, code: userCode } = req.body;
+
     if (!url) return res.status(400).json({ error: "URL required" });
 
-    let { code } = req.body;
+    let code;
 
-    if (!code) {
-      // Keep generating until we find a unique code
+    if (userCode) {
+      // If user provides a code, check uniqueness
+      const exists = await Link.findOne({ code: userCode });
+      if (exists) return res.status(409).json({ error: "Code already exists" });
+      code = userCode;
+    } else {
+      // Generate unique code automatically
       let isUnique = false;
       while (!isUnique) {
         code = nanoid(6);
         const exists = await Link.findOne({ code });
         if (!exists) isUnique = true;
       }
-    } else {
-      // User-provided code must be unique
-      const exists = await Link.findOne({ code });
-      if (exists) return res.status(409).json({ error: "Code already exists" });
     }
 
     const link = await Link.create({ code, targetUrl: url });
 
-    // Return full short URL
-    res.status(201).json({ ...link.toObject(), shortUrl: `${BASE_URL}/${code}` });
+    res.status(201).json({ 
+      ...link.toObject(),
+      shortUrl: `${BASE_URL}/${code}`
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
