@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
 import linkRoutes from "./routes/linkRoutes.js";
 import Link from "./models/Link.js";
 
@@ -18,6 +19,10 @@ app.get("/healthz", (req, res) => {
 
 // All API Routes
 app.use("/api/links", linkRoutes);
+
+// Serve React frontend
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "../dist"))); 
 
 // Redirect Handler
 app.get("/:code", async (req, res) => {
@@ -37,11 +42,17 @@ app.get("/:code", async (req, res) => {
   }
 });
 
+// Catch-all route to serve React frontend for any unknown routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
+});
+
+// Connect to MongoDB and start server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    app.listen(process.env.PORT, () =>
-      console.log("Server running on port " + process.env.PORT)
+    app.listen(process.env.PORT || 3000, () =>
+      console.log("Server running on port " + (process.env.PORT || 3000))
     );
   })
   .catch((err) => console.error(err));
