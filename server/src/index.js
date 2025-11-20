@@ -17,6 +17,10 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Serve React frontend (client build)
+const clientBuildPath = path.join(__dirname, "./dist"); // server/dist
+app.use(express.static(clientBuildPath));
+
 // Health check
 app.get("/healthz", (req, res) => {
   res.status(200).json({ ok: true, version: "1.0" });
@@ -24,9 +28,6 @@ app.get("/healthz", (req, res) => {
 
 // API Routes
 app.use("/api/links", linkRoutes);
-
-// Serve React frontend
-app.use(express.static(path.join(__dirname, "./dist"))); // ./dist if dist is inside server/
 
 // Redirect handler
 app.get("/:code", async (req, res) => {
@@ -47,15 +48,10 @@ app.get("/:code", async (req, res) => {
   }
 });
 
-// Catch-all route for React frontend
-// Catch-all route for React frontend
-// Safe way in Express 5
-// Catch-all route for React frontend (Express 5 safe)
+// Catch-all route to serve React frontend for any unknown routes
 app.all(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "./dist/index.html"));
+  res.sendFile(path.join(clientBuildPath, "index.html"));
 });
-
-
 
 // Connect to MongoDB and start server
 mongoose
