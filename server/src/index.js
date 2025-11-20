@@ -50,9 +50,11 @@ app.get("/:code", async (req, res) => {
 // Catch-all route for React frontend
 // Catch-all route for React frontend
 // Safe way in Express 5
-app.get("*", (req, res) => {
+// Catch-all route for React frontend (Express 5 safe)
+app.all(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "./dist/index.html"));
 });
+
 
 
 // Connect to MongoDB and start server
