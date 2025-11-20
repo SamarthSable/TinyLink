@@ -11,7 +11,7 @@ export const createLink = async (req, res) => {
     let { code } = req.body;
 
     if (!code) {
-      // Generate unique code
+      // Keep generating until we find a unique code
       let isUnique = false;
       while (!isUnique) {
         code = nanoid(6);
