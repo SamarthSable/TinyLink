@@ -8,15 +8,17 @@ export const createLink = async (req, res) => {
   try {
     const { url, code: userCode } = req.body;
 
-    if (!url) return res.status(400).json({ error: "URL required" });
+    if (!url || url.trim() === "") {
+      return res.status(400).json({ error: "URL required" });
+    }
 
     let code;
 
     if (userCode && userCode.trim() !== "") {
-      // If user provides a code, check uniqueness
+      // User provided a custom code
       const exists = await Link.findOne({ code: userCode });
       if (exists) return res.status(409).json({ error: "Code already exists" });
-      code = userCode;
+      code = userCode.trim();
     } else {
       // Generate unique code automatically
       let isUnique = false;
@@ -27,7 +29,7 @@ export const createLink = async (req, res) => {
       }
     }
 
-    const link = await Link.create({ code, targetUrl: url });
+    const link = await Link.create({ code, targetUrl: url.trim() });
 
     res.status(201).json({
       ...link.toObject(),

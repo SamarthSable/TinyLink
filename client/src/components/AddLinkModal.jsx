@@ -6,13 +6,18 @@ export default function AddLinkModal({ show, onClose, onDone }) {
   const [url, setUrl] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
-
 const submit = async () => {
   setLoading(true);
   try {
+    if (!url.trim()) {
+      alert("Please enter a URL");
+      setLoading(false);
+      return;
+    }
+
     // Only send code if user entered something
-    const payload = { url };
-    if (code.trim() !== "") payload.code = code;
+    const payload = { url: url.trim() };
+    if (code.trim() !== "") payload.code = code.trim();
 
     await createLink(payload);
     onDone();
@@ -24,6 +29,7 @@ const submit = async () => {
   }
   setLoading(false);
 };
+
 
   return (
     <Modal show={show} onHide={onClose}>
