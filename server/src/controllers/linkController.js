@@ -7,18 +7,14 @@ const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 export const createLink = async (req, res) => {
   try {
     const { url, code: userCode } = req.body;
-
     if (!url) return res.status(400).json({ error: "URL required" });
 
     let code;
-
     if (userCode) {
-      // If user provides a code, check uniqueness
       const exists = await Link.findOne({ code: userCode });
       if (exists) return res.status(409).json({ error: "Code already exists" });
       code = userCode;
     } else {
-      // Generate unique code automatically
       let isUnique = false;
       while (!isUnique) {
         code = nanoid(6);
@@ -28,11 +24,7 @@ export const createLink = async (req, res) => {
     }
 
     const link = await Link.create({ code, targetUrl: url });
-
-    res.status(201).json({ 
-      ...link.toObject(),
-      shortUrl: `${BASE_URL}/${code}`
-    });
+    res.status(201).json({ ...link.toObject(), shortUrl: `${BASE_URL}/${code}` });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
