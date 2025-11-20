@@ -17,7 +17,7 @@ export const createLink = async (req, res) => {
     if (userCode && userCode.trim() !== "") {
       // User provided a custom code
       const exists = await Link.findOne({ code: userCode });
-      if (exists) return res.status(409).json({ error: "Code already exists" });
+      if (exists) return res.status(409).json({ error: "backend called" });
       code = userCode.trim();
     } else {
       // Generate unique code automatically
