@@ -7,19 +7,23 @@ export default function AddLinkModal({ show, onClose, onDone }) {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const submit = async () => {
-    setLoading(true);
-    try {
-      await createLink({ url, code });
-      onDone();
-      onClose();
-      setUrl("");
-      setCode("");
-    } catch (e) {
-      alert("Code already exists");
-    }
-    setLoading(false);
-  };
+const submit = async () => {
+  setLoading(true);
+  try {
+    // Only send code if user entered something
+    const payload = { url };
+    if (code.trim() !== "") payload.code = code;
+
+    await createLink(payload);
+    onDone();
+    onClose();
+    setUrl("");
+    setCode("");
+  } catch (e) {
+    alert(e.response?.data?.error || "Server error");
+  }
+  setLoading(false);
+};
 
   return (
     <Modal show={show} onHide={onClose}>
