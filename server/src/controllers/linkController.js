@@ -1,7 +1,33 @@
+
+
+
 import Link from "../models/Link.js";
 import { nanoid } from "nanoid";
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+
+// NEW CONTROLLER: Handles redirection and click tracking
+export const redirectToTargetUrl = async (req, res) => {
+  try {
+    const code = req.params.code;
+    const link = await Link.findOne({ code });
+
+    if (!link) {
+      return res.status(404).send("Tiny link not found.");
+    }
+
+    // 1. Increment clicks and update last clicked time (saved to DB)
+    link.clicks += 1;
+    link.lastClicked = new Date();
+    await link.save(); // Persist the click count change
+
+    // 2. Perform the redirect
+    return res.redirect(302, link.targetUrl);
+  } catch (e) {
+    console.error("Redirection error:", e);
+    res.status(500).send("Server error during link resolution.");
+  }
+};
 
 
 export const createLink = async (req, res) => {

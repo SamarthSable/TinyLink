@@ -1,11 +1,15 @@
+
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import linkRoutes from "./routes/linkRoutes.js";
-import Link from "./models/Link.js";
+
+// Import the API routes
+import linkRoutes from "./routes/linkRoutes.js"; 
+// Import the specific redirect controller, as it needs to be mounted at the root level
+import { redirectToTargetUrl } from "./controllers/linkController.js"; 
 
 dotenv.config();
 
@@ -26,27 +30,12 @@ app.get("/healthz", (req, res) => {
   res.status(200).json({ ok: true, version: "1.0" });
 });
 
-// API Routes
+// API Routes (Mounted under /api/links)
 app.use("/api/links", linkRoutes);
 
-// Redirect handler
-app.get("/:code", async (req, res) => {
-  try {
-    const code = req.params.code;
-    const link = await Link.findOne({ code });
-
-    if (!link) return res.status(404).send("Not found");
-
-    link.clicks += 1;
-    link.lastClicked = new Date();
-    await link.save();
-
-    return res.redirect(302, link.targetUrl);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+// Redirect handler (The most crucial change: using the imported controller)
+// This MUST be placed AFTER your API routes to prevent conflicts.
+app.get("/:code", redirectToTargetUrl); 
 
 // Catch-all route to serve React frontend for any unknown routes
 app.all(/.*/, (req, res) => {
