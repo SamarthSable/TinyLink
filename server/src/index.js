@@ -6,6 +6,9 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
+console.log("Loaded MONGO_URI:", process.env.MONGO_URI);
+console.log("Loaded PORT:", process.env.PORT);
+
 // Import the API routes
 import linkRoutes from "./routes/linkRoutes.js"; 
 // Import the specific redirect controller, as it needs to be mounted at the root level
