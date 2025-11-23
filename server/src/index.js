@@ -46,10 +46,19 @@ app.all(/.*/, (req, res) => {
 });
 
 // Connect to MongoDB and start server
+console.log("Connecting to MongoDB:", process.env.MONGO_URI);
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    const port = process.env.PORT || 3000;
-    app.listen(port, () => console.log("Server running on port " + port));
+    console.log("MongoDB Connected Successfully ✔");
+
+    const port = process.env.PORT || 8080;
+    app.listen(port, () => {
+      console.log("Server running on port " + port);
+    });
   })
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Failed");
+    console.error(err);
+  });
